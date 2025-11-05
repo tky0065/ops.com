@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import Link from "next/link";
+import Image from "next/image";
 import { Toaster } from "@/components/ui/sonner";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { MobileNav } from "@/components/MobileNav";
@@ -12,8 +13,39 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "DevOps Deployment Accelerator",
-  description: "Transform Docker Compose to production-ready Kubernetes and Docker Swarm configurations in minutes",
+  title: "DevOps Deployment Accelerator | Docker Compose to Kubernetes",
+  description: "Transform Docker Compose to production-ready Kubernetes and Docker Swarm configurations in minutes. Auto-generate reverse proxy configs, health checks, and security best practices.",
+  keywords: ["DevOps", "Kubernetes", "Docker", "Docker Compose", "K8s", "Deployment", "Automation", "Traefik", "Nginx"],
+  authors: [{ name: "EnokDev", url: "https://enokdev-com.vercel.app/" }],
+  openGraph: {
+    title: "DevOps Deployment Accelerator",
+    description: "Transform Docker Compose to production-ready Kubernetes in minutes",
+    url: "https://ops.com",
+    siteName: "DevOps Accelerator",
+    images: [
+      {
+        url: "/og-image.svg",
+        width: 1200,
+        height: 630,
+        alt: "DevOps Accelerator - Docker to Kubernetes",
+      },
+    ],
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "DevOps Deployment Accelerator",
+    description: "Transform Docker Compose to production-ready Kubernetes in minutes",
+    images: ["/og-image.svg"],
+  },
+  icons: {
+    icon: [
+      { url: "/favicon.svg", type: "image/svg+xml" },
+      { url: "/icon.svg", type: "image/svg+xml" },
+    ],
+    apple: "/apple-touch-icon.png",
+  },
 };
 
 export default function RootLayout({
@@ -29,8 +61,23 @@ export default function RootLayout({
           <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
             <div className="container mx-auto px-4 flex h-16 items-center justify-between">
               <div className="flex">
-                <Link href="/" className="flex items-center space-x-2">
-                  <span className="text-xl font-bold">DevOps Accelerator</span>
+                <Link href="/" className="flex items-center space-x-3">
+                  <Image
+                    src="/logo.svg"
+                    alt="DevOps Accelerator Logo"
+                    width={180}
+                    height={36}
+                    className="h-9 w-auto dark:hidden"
+                    priority
+                  />
+                  <Image
+                    src="/logo-dark.svg"
+                    alt="DevOps Accelerator Logo"
+                    width={180}
+                    height={36}
+                    className="h-9 w-auto hidden dark:block"
+                    priority
+                  />
                 </Link>
               </div>
 

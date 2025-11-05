@@ -1,0 +1,87 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- OG Image for social media sharing (1200x630) -->
+
+  <!-- Background gradient -->
+  <defs>
+    <linearGradient id="bg-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0f172a"/>
+      <stop offset="100%" style="stop-color:#1e293b"/>
+    </linearGradient>
+    <linearGradient id="pipeline-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#ff6b35"/>
+      <stop offset="50%" style="stop-color:#f59e0b"/>
+      <stop offset="100%" style="stop-color:#2563eb"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1200" height="630" fill="url(#bg-gradient)"/>
+
+  <!-- Decorative grid pattern -->
+  <g opacity="0.05">
+    <path d="M0 0h1200M0 70h1200M0 140h1200M0 210h1200M0 280h1200M0 350h1200M0 420h1200M0 490h1200M0 560h1200M0 630h1200" stroke="white" stroke-width="1"/>
+    <path d="M0 0v630M100 0v630M200 0v630M300 0v630M400 0v630M500 0v630M600 0v630M700 0v630M800 0v630M900 0v630M1000 0v630M1100 0v630M1200 0v630" stroke="white" stroke-width="1"/>
+  </g>
+
+  <!-- Large pipeline visualization (centered) -->
+  <g transform="translate(280, 200)">
+    <!-- Segment 1: Docker Compose -->
+    <rect x="0" y="0" width="120" height="150" rx="12" fill="#ff6b35" opacity="0.9"/>
+    <path d="M30 40h60M30 70h60M30 100h60" stroke="white" stroke-width="6" stroke-linecap="round"/>
+    <text x="60" y="190" font-family="system-ui, -apple-system, sans-serif" font-size="18" font-weight="600" fill="#cbd5e1" text-anchor="middle">
+      Docker Compose
+    </text>
+
+    <!-- Arrow 1 -->
+    <path d="M140 75h80" stroke="#94a3b8" stroke-width="6" stroke-linecap="round"/>
+    <path d="M200 60l30 15-30 15" stroke="#94a3b8" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+
+    <!-- Segment 2: Conversion -->
+    <rect x="250" y="-20" width="140" height="190" rx="12" fill="url(#pipeline-gradient)"/>
+    <circle cx="280" cy="30" r="12" fill="white" opacity="0.8"/>
+    <circle cx="320" cy="75" r="12" fill="white" opacity="0.8"/>
+    <circle cx="360" cy="120" r="12" fill="white" opacity="0.8"/>
+    <path d="M280 30l40 45 40 45" stroke="white" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" opacity="0.6"/>
+    <text x="320" y="210" font-family="system-ui, -apple-system, sans-serif" font-size="18" font-weight="600" fill="#cbd5e1" text-anchor="middle">
+      Auto-Convert
+    </text>
+
+    <!-- Arrow 2 -->
+    <path d="M410 75h80" stroke="#94a3b8" stroke-width="6" stroke-linecap="round"/>
+    <path d="M470 60l30 15-30 15" stroke="#94a3b8" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+
+    <!-- Segment 3: K8s/Swarm -->
+    <rect x="520" y="0" width="120" height="150" rx="12" fill="#2563eb" opacity="0.9"/>
+    <path d="M550 40l30 20 30-20M550 110l30-20 30 20M550 75h60" stroke="white" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="580" y="190" font-family="system-ui, -apple-system, sans-serif" font-size="18" font-weight="600" fill="#cbd5e1" text-anchor="middle">
+      Production Ready
+    </text>
+  </g>
+
+  <!-- Title -->
+  <text x="600" y="100" font-family="system-ui, -apple-system, sans-serif" font-size="64" font-weight="800" fill="#f8fafc" text-anchor="middle">
+    DevOps Accelerator
+  </text>
+
+  <!-- Subtitle -->
+  <text x="600" y="145" font-family="system-ui, -apple-system, sans-serif" font-size="28" font-weight="500" fill="#94a3b8" text-anchor="middle">
+    Docker Compose → Kubernetes in Minutes
+  </text>
+
+  <!-- Features badges -->
+  <g transform="translate(320, 530)">
+    <rect x="0" y="0" width="140" height="40" rx="20" fill="#1e293b" stroke="#334155" stroke-width="2"/>
+    <text x="70" y="26" font-family="system-ui, -apple-system, sans-serif" font-size="16" font-weight="600" fill="#10b981" text-anchor="middle">
+      ⚡ Fast
+    </text>
+
+    <rect x="160" y="0" width="140" height="40" rx="20" fill="#1e293b" stroke="#334155" stroke-width="2"/>
+    <text x="230" y="26" font-family="system-ui, -apple-system, sans-serif" font-size="16" font-weight="600" fill="#3b82f6" text-anchor="middle">
+      🛡️ Secure
+    </text>
+
+    <rect x="320" y="0" width="140" height="40" rx="20" fill="#1e293b" stroke="#334155" stroke-width="2"/>
+    <text x="390" y="26" font-family="system-ui, -apple-system, sans-serif" font-size="16" font-weight="600" fill="#f59e0b" text-anchor="middle">
+      🎯 Simple
+    </text>
+  </g>
+</svg>
