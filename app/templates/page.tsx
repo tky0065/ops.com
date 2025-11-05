@@ -92,7 +92,7 @@ export default function TemplatesPage() {
   });
 
   return (
-    <div className="container mx-auto px-4 py-8 space-y-8">
+    <div className="max-w-7xl mx-auto px-4 py-8 space-y-8">
       {/* Header */}
       <div>
         <h1 className="text-3xl font-bold">Template Library</h1>
@@ -121,7 +121,7 @@ export default function TemplatesPage() {
           <p className="text-muted-foreground">Try a different search term</p>
         </Card>
       ) : (
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 xl:grid-cols-3">
           {filteredTemplates.map((template) => (
             <Card
               key={template.id}
