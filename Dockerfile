@@ -10,8 +10,8 @@ RUN apk add --no-cache libc6-compat
 # Copy package files
 COPY package.json package-lock.json ./
 
-# Install production dependencies only
-RUN npm ci --omit=dev
+# Install ALL dependencies (needed for build with TypeScript)
+RUN npm ci
 
 # Stage 2: Builder
 FROM node:20-alpine AS builder
