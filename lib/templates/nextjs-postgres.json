@@ -1,0 +1,16 @@
+{
+  "id": "nextjs-postgres",
+  "name": "Next.js + PostgreSQL",
+  "description": "Next.js application with PostgreSQL database and Redis cache",
+  "category": "Full Stack",
+  "tags": ["nextjs", "react", "postgresql", "redis", "typescript"],
+  "dockerCompose": "version: '3.8'\n\nservices:\n  nextjs:\n    image: node:20-alpine\n    working_dir: /app\n    ports:\n      - '3000:3000'\n    environment:\n      - NODE_ENV=production\n      - DATABASE_URL=postgresql://postgres:password@postgres:5432/nextapp\n      - REDIS_URL=redis://redis:6379\n      - NEXTAUTH_URL=http://localhost:3000\n      - NEXTAUTH_SECRET=your-secret-key\n    volumes:\n      - ./app:/app\n    command: npm start\n    depends_on:\n      - postgres\n      - redis\n\n  postgres:\n    image: postgres:16-alpine\n    ports:\n      - '5432:5432'\n    environment:\n      - POSTGRES_USER=postgres\n      - POSTGRES_PASSWORD=password\n      - POSTGRES_DB=nextapp\n    volumes:\n      - postgres_data:/var/lib/postgresql/data\n\n  redis:\n    image: redis:7-alpine\n    ports:\n      - '6379:6379'\n    command: redis-server --appendonly yes\n    volumes:\n      - redis_data:/data\n\nvolumes:\n  postgres_data:\n  redis_data:\n",
+  "recommendedOptions": {
+    "targetPlatform": "kubernetes",
+    "proxyType": "caddy",
+    "addHealthChecks": true,
+    "addResourceLimits": true,
+    "resourceProfile": "medium",
+    "addSecurity": true
+  }
+}

@@ -34,9 +34,9 @@ Actuellement, convertir un `docker-compose.yml` en manifests Kubernetes producti
 ### Stack Technique Complète
 
 **Frontend & Framework**
-- Next.js 15+ (App Router, Server Components)
+- Next.js 16+ (App Router, Server Components)
 - TypeScript (strict mode)
-- React 18.3+
+- React 19+
 
 **Styling & UI**
 - Tailwind CSS 4

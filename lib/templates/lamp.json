@@ -1,0 +1,16 @@
+{
+  "id": "lamp-stack",
+  "name": "LAMP Stack",
+  "description": "Linux, Apache, MySQL, PHP classic web stack",
+  "category": "Full Stack",
+  "tags": ["linux", "apache", "mysql", "php"],
+  "dockerCompose": "version: '3.8'\n\nservices:\n  php:\n    image: php:8.2-apache\n    ports:\n      - '80:80'\n    environment:\n      - APACHE_DOCUMENT_ROOT=/var/www/html\n    volumes:\n      - ./src:/var/www/html\n    depends_on:\n      - mysql\n\n  mysql:\n    image: mysql:8.0\n    ports:\n      - '3306:3306'\n    environment:\n      - MYSQL_ROOT_PASSWORD=rootpassword\n      - MYSQL_DATABASE=myapp\n      - MYSQL_USER=appuser\n      - MYSQL_PASSWORD=apppassword\n    volumes:\n      - mysql_data:/var/lib/mysql\n\n  phpmyadmin:\n    image: phpmyadmin:latest\n    ports:\n      - '8080:80'\n    environment:\n      - PMA_HOST=mysql\n      - PMA_PORT=3306\n      - PMA_USER=root\n      - PMA_PASSWORD=rootpassword\n    depends_on:\n      - mysql\n\nvolumes:\n  mysql_data:\n",
+  "recommendedOptions": {
+    "targetPlatform": "swarm",
+    "proxyType": "nginx",
+    "addHealthChecks": true,
+    "addResourceLimits": true,
+    "resourceProfile": "small",
+    "addSecurity": true
+  }
+}

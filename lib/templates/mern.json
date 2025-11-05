@@ -1,0 +1,16 @@
+{
+  "id": "mern-stack",
+  "name": "MERN Stack",
+  "description": "MongoDB, Express, React, Node.js full-stack application",
+  "category": "Full Stack",
+  "tags": ["mongodb", "express", "react", "nodejs", "javascript"],
+  "dockerCompose": "version: '3.8'\n\nservices:\n  mongodb:\n    image: mongo:7\n    ports:\n      - '27017:27017'\n    environment:\n      - MONGO_INITDB_ROOT_USERNAME=admin\n      - MONGO_INITDB_ROOT_PASSWORD=password123\n    volumes:\n      - mongodb_data:/data/db\n\n  backend:\n    image: node:20-alpine\n    working_dir: /app\n    ports:\n      - '5000:5000'\n    environment:\n      - NODE_ENV=production\n      - MONGODB_URI=mongodb://admin:password123@mongodb:27017/myapp?authSource=admin\n      - PORT=5000\n    volumes:\n      - ./backend:/app\n    command: npm start\n    depends_on:\n      - mongodb\n\n  frontend:\n    image: node:20-alpine\n    working_dir: /app\n    ports:\n      - '3000:3000'\n    environment:\n      - REACT_APP_API_URL=http://localhost:5000\n    volumes:\n      - ./frontend:/app\n    command: npm start\n    depends_on:\n      - backend\n\nvolumes:\n  mongodb_data:\n",
+  "recommendedOptions": {
+    "targetPlatform": "both",
+    "proxyType": "traefik",
+    "addHealthChecks": true,
+    "addResourceLimits": true,
+    "resourceProfile": "medium",
+    "addSecurity": true
+  }
+}

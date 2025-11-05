@@ -1,0 +1,16 @@
+{
+  "id": "wordpress",
+  "name": "WordPress + MySQL",
+  "description": "WordPress CMS with MySQL database",
+  "category": "CMS",
+  "tags": ["wordpress", "php", "mysql", "cms"],
+  "dockerCompose": "version: '3.8'\n\nservices:\n  db:\n    image: mysql:8.0\n    ports:\n      - '3306:3306'\n    environment:\n      - MYSQL_ROOT_PASSWORD=somewordpress\n      - MYSQL_DATABASE=wordpress\n      - MYSQL_USER=wordpress\n      - MYSQL_PASSWORD=wordpress\n    volumes:\n      - db_data:/var/lib/mysql\n\n  wordpress:\n    image: wordpress:latest\n    ports:\n      - '80:80'\n    environment:\n      - WORDPRESS_DB_HOST=db:3306\n      - WORDPRESS_DB_USER=wordpress\n      - WORDPRESS_DB_PASSWORD=wordpress\n      - WORDPRESS_DB_NAME=wordpress\n    volumes:\n      - wordpress_data:/var/www/html\n    depends_on:\n      - db\n\nvolumes:\n  db_data:\n  wordpress_data:\n",
+  "recommendedOptions": {
+    "targetPlatform": "both",
+    "proxyType": "nginx",
+    "addHealthChecks": true,
+    "addResourceLimits": true,
+    "resourceProfile": "medium",
+    "addSecurity": true
+  }
+}
