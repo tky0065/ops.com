@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { FileUpload } from '@/components/FileUpload';
 import { ManifestPreview } from '@/components/ManifestPreview';
 import { Card } from '@/components/ui/card';
@@ -27,6 +27,7 @@ import { DiffViewer } from '@/components/DiffViewer';
 import { EnhancedYamlEditor } from '@/components/EnhancedYamlEditor';
 import type { DockerCompose } from '@/types/dockerCompose';
 import type { ValidationResult } from '@/lib/validators/manifestValidator';
+import type { Project } from '@/types/project';
 
 // Converters will be dynamically imported when needed to reduce initial bundle size
 
@@ -76,6 +77,52 @@ export default function ConvertPage() {
 
   // State for enhanced editor
   const [showEditor, setShowEditor] = useState(false);
+
+  // Load project from sessionStorage on mount (when redirected from projects page)
+  useEffect(() => {
+    const selectedProjectJson = sessionStorage.getItem('selectedProject');
+    if (selectedProjectJson) {
+      try {
+        const project: Project = JSON.parse(selectedProjectJson);
+
+        // Load project data into state
+        setProjectName(project.name);
+        setDockerComposeContent(project.dockerCompose.content);
+        setFileName(project.dockerCompose.filename);
+        setParsedCompose(project.dockerCompose.parsed);
+
+        // Load options
+        setPlatform(project.options.targetPlatform);
+        setProxyType(project.options.proxyType);
+        setAddHealthChecks(project.options.addHealthChecks);
+        setAddResourceLimits(project.options.addResourceLimits);
+        setResourceProfile(project.options.resourceProfile);
+        setAddSecurity(project.options.addSecurity);
+        setEmail(project.options.letsEncryptEmail || '');
+
+        // Set validation status as valid since it's a saved project
+        setValidationStatus({
+          isValid: true,
+          errors: [],
+          warnings: [],
+        });
+
+        // Clear session storage after loading
+        sessionStorage.removeItem('selectedProject');
+
+        toast.success('Project loaded', {
+          description: `"${project.name}" has been loaded successfully`,
+        });
+      } catch (error) {
+        console.error('Error loading project:', error);
+        toast.error('Failed to load project', {
+          description: error instanceof Error ? error.message : 'Unknown error',
+        });
+        // Clear invalid data from session storage
+        sessionStorage.removeItem('selectedProject');
+      }
+    }
+  }, []); // Run once on mount
 
   const handleFileUpload = (content: string, filename: string) => {
     setDockerComposeContent(content);
