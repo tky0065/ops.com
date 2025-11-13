@@ -12,11 +12,14 @@ export interface DockerComposeService {
   };
   container_name?: string;
   ports?: string[];
-  environment?: Record<string, string> | string[];
+  environment?: Record<string, string | number | boolean> | string[];
   env_file?: string | string[];
   volumes?: string[];
   networks?: string[];
-  depends_on?: string[];
+  depends_on?: string[] | Record<string, {
+    condition?: 'service_started' | 'service_healthy' | 'service_completed_successfully';
+    restart?: boolean;
+  }>;
   command?: string | string[];
   entrypoint?: string | string[];
   working_dir?: string;
