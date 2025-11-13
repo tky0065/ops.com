@@ -16,13 +16,15 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { toast } from 'sonner';
-import { Loader2, Download, Save, CheckCircle2, AlertCircle, AlertTriangle } from 'lucide-react';
+import { Loader2, Download, Save, CheckCircle2, AlertCircle, AlertTriangle, ShieldCheck } from 'lucide-react';
 
 // Import only essential modules at page load
 import { DockerComposeParser } from '@/lib/parsers/dockerComposeParser';
 import { LocalStorageManager } from '@/lib/storage/localStorage';
 import { HelpTooltip } from '@/components/HelpTooltip';
+import { ValidationReport } from '@/components/ValidationReport';
 import type { DockerCompose } from '@/types/dockerCompose';
+import type { ValidationResult } from '@/lib/validators/manifestValidator';
 
 // Converters will be dynamically imported when needed to reduce initial bundle size
 
@@ -61,6 +63,14 @@ export default function ConvertPage() {
     templates?: Record<string, string>;
   }>({});
   const [parsedCompose, setParsedCompose] = useState<DockerCompose | null>(null);
+
+  // State for validation results
+  const [isValidating, setIsValidating] = useState(false);
+  const [validationResults, setValidationResults] = useState<{
+    kubernetes?: ValidationResult;
+    dockerStack?: ValidationResult;
+    helm?: ValidationResult;
+  }>({});
 
   const handleFileUpload = (content: string, filename: string) => {
     setDockerComposeContent(content);
@@ -335,6 +345,142 @@ export default function ConvertPage() {
     }
   };
 
+  const handleValidate = async () => {
+    if (!hasResults) {
+      toast.error('No manifests to validate', {
+        description: 'Please convert your Docker Compose file first',
+      });
+      return;
+    }
+
+    setIsValidating(true);
+    const results: {
+      kubernetes?: ValidationResult;
+      dockerStack?: ValidationResult;
+      helm?: ValidationResult;
+    } = {};
+
+    try {
+      toast.info('Validating manifests...');
+
+      // Dynamically import validators
+      const { validateKubernetesManifests, validateDockerStack } = await import(
+        '@/lib/validators/manifestValidator'
+      );
+
+      // Validate Kubernetes manifests
+      if (Object.keys(kubernetesYaml).length > 0) {
+        const allK8sYaml = Object.values(kubernetesYaml).join('\n---\n');
+        results.kubernetes = validateKubernetesManifests(allK8sYaml);
+
+        if (results.kubernetes.valid) {
+          toast.success('Kubernetes manifests valid', {
+            description: `Score: ${results.kubernetes.score}/100`,
+          });
+        } else {
+          toast.error('Kubernetes validation failed', {
+            description: `Found ${results.kubernetes.summary.errorCount} error(s)`,
+          });
+        }
+      }
+
+      // Validate Docker Stack
+      if (dockerStackYaml) {
+        results.dockerStack = validateDockerStack(dockerStackYaml);
+
+        if (results.dockerStack.valid) {
+          toast.success('Docker Stack valid', {
+            description: `Score: ${results.dockerStack.score}/100`,
+          });
+        } else {
+          toast.warning('Docker Stack has issues', {
+            description: `Found ${results.dockerStack.summary.errorCount} error(s)`,
+          });
+        }
+      }
+
+      // Validate Helm Chart
+      if (helmChart.chartYaml && helmChart.valuesYaml) {
+        const { HelmGenerator } = await import('@/lib/converters/helmGenerator');
+        const helmValidation = HelmGenerator.validateHelmChart({
+          chartYaml: helmChart.chartYaml,
+          valuesYaml: helmChart.valuesYaml,
+          templates: helmChart.templates || {},
+        });
+
+        // Convert Helm validation to ValidationResult format
+        results.helm = {
+          valid: helmValidation.valid,
+          score: helmValidation.valid ? 100 : helmValidation.errors.length > 0 ? 0 : 80,
+          errors: helmValidation.errors.map((e) => ({
+            severity: 'error' as const,
+            resource: 'Helm Chart',
+            kind: 'Chart',
+            message: e,
+          })),
+          warnings: helmValidation.warnings.map((w) => ({
+            severity: 'warning' as const,
+            resource: 'Helm Chart',
+            kind: 'Chart',
+            message: w,
+          })),
+          info: [],
+          suggestions: helmValidation.valid
+            ? ['Helm Chart is valid and ready for deployment']
+            : ['Fix errors in Helm Chart before deployment'],
+          summary: {
+            totalResources: 1,
+            validResources: helmValidation.valid ? 1 : 0,
+            errorCount: helmValidation.errors.length,
+            warningCount: helmValidation.warnings.length,
+            infoCount: 0,
+          },
+        };
+
+        if (helmValidation.valid) {
+          toast.success('Helm Chart valid');
+        } else {
+          toast.error('Helm Chart validation failed', {
+            description: `Found ${helmValidation.errors.length} error(s)`,
+          });
+        }
+      }
+
+      setValidationResults(results);
+
+      // Overall summary
+      const totalErrors =
+        (results.kubernetes?.summary.errorCount || 0) +
+        (results.dockerStack?.summary.errorCount || 0) +
+        (results.helm?.summary.errorCount || 0);
+
+      const avgScore = Math.round(
+        (
+          (results.kubernetes?.score || 0) +
+          (results.dockerStack?.score || 0) +
+          (results.helm?.score || 0)
+        ) / Object.keys(results).length
+      );
+
+      if (totalErrors === 0) {
+        toast.success('All validations passed!', {
+          description: `Average quality score: ${avgScore}/100`,
+        });
+      } else {
+        toast.warning('Validation complete', {
+          description: `Found ${totalErrors} total error(s). Check the report below.`,
+        });
+      }
+    } catch (error) {
+      console.error('Validation error:', error);
+      toast.error('Validation failed', {
+        description: error instanceof Error ? error.message : 'Unknown error occurred',
+      });
+    } finally {
+      setIsValidating(false);
+    }
+  };
+
   const hasResults = Object.keys(kubernetesYaml).length > 0 || dockerStackYaml.length > 0;
 
   return (
@@ -565,6 +711,23 @@ export default function ConvertPage() {
               <>
                 <Button
                   variant="outline"
+                  onClick={handleValidate}
+                  disabled={isValidating}
+                >
+                  {isValidating ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Validating...
+                    </>
+                  ) : (
+                    <>
+                      <ShieldCheck className="mr-2 h-4 w-4" />
+                      Validate
+                    </>
+                  )}
+                </Button>
+                <Button
+                  variant="outline"
                   onClick={handleSaveProject}
                 >
                   <Save className="mr-2 h-4 w-4" />
@@ -581,6 +744,15 @@ export default function ConvertPage() {
             )}
           </div>
         </Card>
+      )}
+
+      {/* Validation Report */}
+      {hasResults && Object.keys(validationResults).length > 0 && (
+        <ValidationReport
+          kubernetes={validationResults.kubernetes}
+          dockerStack={validationResults.dockerStack}
+          helm={validationResults.helm}
+        />
       )}
 
       {/* Preview */}
