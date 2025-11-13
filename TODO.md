@@ -291,7 +291,7 @@
     - [x] Parser Docker Compose avec DockerComposeParser
     - [x] Générer Kubernetes manifests (KubernetesConverter)
     - [x] Générer Docker Stack (DockerStackConverter)
-    - [x] Générer proxy config (placeholder)
+    - [x] Générer proxy config (Traefik, Nginx, Caddy intégrés)
     - [x] Générer Helm Chart (HelmGenerator)
     - [x] Appliquer production hardening via options
     - [x] Mettre à jour preview avec tous manifests
