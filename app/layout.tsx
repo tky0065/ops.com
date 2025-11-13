@@ -7,6 +7,7 @@ import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { MobileNav } from "@/components/MobileNav";
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'https://ops.com'),
   title: "DevOps Deployment Accelerator | Docker Compose to Kubernetes",
   description: "Transform Docker Compose to production-ready Kubernetes and Docker Swarm configurations in minutes. Auto-generate reverse proxy configs, health checks, and security best practices.",
   keywords: ["DevOps", "Kubernetes", "Docker", "Docker Compose", "K8s", "Deployment", "Automation", "Traefik", "Nginx"],
