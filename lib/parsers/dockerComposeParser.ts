@@ -24,13 +24,19 @@ const serviceSchema = z.object({
   container_name: z.string().optional(),
   ports: z.array(z.string()).optional(),
   environment: z.union([
-    z.record(z.string(), z.string()),
+    z.record(z.string(), z.union([z.string(), z.number(), z.boolean()])),
     z.array(z.string()),
   ]).optional(),
   env_file: z.union([z.string(), z.array(z.string())]).optional(),
   volumes: z.array(z.string()).optional(),
   networks: z.array(z.string()).optional(),
-  depends_on: z.array(z.string()).optional(),
+  depends_on: z.union([
+    z.array(z.string()),
+    z.record(z.string(), z.object({
+      condition: z.enum(['service_started', 'service_healthy', 'service_completed_successfully']).optional(),
+      restart: z.boolean().optional(),
+    }).passthrough()),
+  ]).optional(),
   command: z.union([z.string(), z.array(z.string())]).optional(),
   entrypoint: z.union([z.string(), z.array(z.string())]).optional(),
   working_dir: z.string().optional(),
@@ -223,13 +229,16 @@ export class DockerComposeParser {
       const volumes = this.parseVolumes(service.volumes || []);
       const environmentVariables = this.parseEnvironment(service.environment);
 
+      // Extract depends_on - support both short and long format
+      const dependsOn = this.extractDependsOn(service.depends_on);
+
       services.push({
         name: serviceName,
         image: service.image,
         ports,
         volumes,
         environmentVariables,
-        dependsOn: service.depends_on || [],
+        dependsOn,
         hasHealthCheck: !!service.healthcheck,
         replicas: service.deploy?.replicas,
       });
@@ -321,9 +330,10 @@ export class DockerComposeParser {
   /**
    * Parse environment variables from Docker Compose format
    * Supports: object format and array format ("KEY=VALUE")
+   * Converts boolean and number values to strings
    */
   private static parseEnvironment(
-    environment?: Record<string, string> | string[]
+    environment?: Record<string, string | number | boolean> | string[]
   ): Record<string, string> {
     if (!environment) {
       return {};
@@ -340,7 +350,32 @@ export class DockerComposeParser {
       return result;
     }
 
-    return environment;
+    // Convert all values to strings
+    const result: Record<string, string> = {};
+    for (const [key, value] of Object.entries(environment)) {
+      result[key] = String(value);
+    }
+    return result;
+  }
+
+  /**
+   * Extract depends_on service names from both short and long format
+   * Short format: ["postgres", "redis"]
+   * Long format: { postgres: { condition: "service_healthy" }, redis: { condition: "service_started" } }
+   */
+  private static extractDependsOn(
+    dependsOn?: string[] | Record<string, { condition?: string; restart?: boolean }>
+  ): string[] {
+    if (!dependsOn) {
+      return [];
+    }
+
+    if (Array.isArray(dependsOn)) {
+      return dependsOn;
+    }
+
+    // Extract service names from long format
+    return Object.keys(dependsOn);
   }
 
   /**
