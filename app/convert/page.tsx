@@ -23,6 +23,7 @@ import { DockerComposeParser } from '@/lib/parsers/dockerComposeParser';
 import { LocalStorageManager } from '@/lib/storage/localStorage';
 import { HelpTooltip } from '@/components/HelpTooltip';
 import { ValidationReport } from '@/components/ValidationReport';
+import { DiffViewer } from '@/components/DiffViewer';
 import type { DockerCompose } from '@/types/dockerCompose';
 import type { ValidationResult } from '@/lib/validators/manifestValidator';
 
@@ -752,6 +753,16 @@ export default function ConvertPage() {
           kubernetes={validationResults.kubernetes}
           dockerStack={validationResults.dockerStack}
           helm={validationResults.helm}
+        />
+      )}
+
+      {/* Diff Viewer */}
+      {hasResults && dockerComposeContent && (
+        <DiffViewer
+          originalYaml={dockerComposeContent}
+          kubernetesYaml={kubernetesYaml}
+          dockerStackYaml={dockerStackYaml}
+          helmChartYaml={helmChart.valuesYaml}
         />
       )}
 
