@@ -33,7 +33,7 @@ import type { Project } from '@/types/project';
 
 type Platform = 'kubernetes' | 'swarm' | 'both';
 type ProxyType = 'traefik' | 'nginx' | 'caddy' | 'none';
-type ResourceProfile = 'small' | 'medium' | 'large';
+type ResourceProfile = 'small' | 'medium' | 'large' | 'custom';
 
 export default function ConvertPage() {
   // State for file upload
@@ -96,7 +96,7 @@ export default function ConvertPage() {
         setProxyType(project.options.proxyType);
         setAddHealthChecks(project.options.addHealthChecks);
         setAddResourceLimits(project.options.addResourceLimits);
-        setResourceProfile(project.options.resourceProfile);
+        setResourceProfile(project.options.resourceProfile || 'medium');
         setAddSecurity(project.options.addSecurity);
         setEmail(project.options.letsEncryptEmail || '');
 
