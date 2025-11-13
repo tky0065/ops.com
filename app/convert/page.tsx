@@ -225,10 +225,65 @@ export default function ConvertPage() {
         }
       }
 
-      // Step 4: Generate proxy config (placeholder - will be implemented with proxy generators)
+      // Step 4: Generate proxy config
       if (proxyType !== 'none') {
-        // TODO: Integrate proxy generators
-        setProxyConfig(`# ${proxyType.toUpperCase()} Configuration\n# TODO: Implement proxy config generation`);
+        toast.info(`Generating ${proxyType} configuration...`);
+        let proxyConfigContent = '';
+
+        try {
+          if (proxyType === 'traefik') {
+            const { TraefikGenerator } = await import('@/lib/converters/proxyConfigs/traefikGenerator');
+
+            // Generate static configuration
+            const staticConfig = TraefikGenerator.generateStaticConfig({
+              email: email || 'admin@example.com',
+              dashboard: true,
+            });
+
+            proxyConfigContent = `# Traefik v2.10 Static Configuration\n${staticConfig}`;
+          } else if (proxyType === 'nginx') {
+            const { NginxGenerator } = await import('@/lib/converters/proxyConfigs/nginxGenerator');
+
+            // Get first service info for demonstration
+            const firstServiceName = Object.keys(parseResult.data.services)[0];
+            const firstService = parseResult.data.services[firstServiceName];
+            const firstPort = firstService.ports?.[0]?.split(':')[1] || '80';
+
+            const nginxConfig = NginxGenerator.generateConfig({
+              serviceName: firstServiceName,
+              domain: `${firstServiceName}.example.com`,
+              port: parseInt(firstPort),
+            });
+
+            proxyConfigContent = nginxConfig;
+          } else if (proxyType === 'caddy') {
+            const { CaddyGenerator } = await import('@/lib/converters/proxyConfigs/caddyGenerator');
+
+            // Get first service info for demonstration
+            const firstServiceName = Object.keys(parseResult.data.services)[0];
+            const firstService = parseResult.data.services[firstServiceName];
+            const firstPort = firstService.ports?.[0]?.split(':')[1] || '80';
+
+            const caddyConfig = CaddyGenerator.generateCaddyfile(
+              {
+                serviceName: firstServiceName,
+                domain: `${firstServiceName}.example.com`,
+                port: parseInt(firstPort),
+              },
+              { email: email || 'admin@example.com' }
+            );
+
+            proxyConfigContent = caddyConfig;
+          }
+
+          setProxyConfig(proxyConfigContent);
+          toast.success(`${proxyType} configuration generated`);
+        } catch (error) {
+          console.error('Proxy config generation error:', error);
+          toast.error(`Failed to generate ${proxyType} configuration`, {
+            description: error instanceof Error ? error.message : 'Unknown error',
+          });
+        }
       }
 
       // Step 5: Generate Helm Chart
