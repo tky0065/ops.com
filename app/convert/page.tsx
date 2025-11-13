@@ -24,6 +24,7 @@ import { LocalStorageManager } from '@/lib/storage/localStorage';
 import { HelpTooltip } from '@/components/HelpTooltip';
 import { ValidationReport } from '@/components/ValidationReport';
 import { DiffViewer } from '@/components/DiffViewer';
+import { EnhancedYamlEditor } from '@/components/EnhancedYamlEditor';
 import type { DockerCompose } from '@/types/dockerCompose';
 import type { ValidationResult } from '@/lib/validators/manifestValidator';
 
@@ -72,6 +73,9 @@ export default function ConvertPage() {
     dockerStack?: ValidationResult;
     helm?: ValidationResult;
   }>({});
+
+  // State for enhanced editor
+  const [showEditor, setShowEditor] = useState(false);
 
   const handleFileUpload = (content: string, filename: string) => {
     setDockerComposeContent(content);
@@ -496,6 +500,45 @@ export default function ConvertPage() {
 
       {/* File Upload */}
       <FileUpload onFileUpload={handleFileUpload} />
+
+      {/* Enhanced Editor Toggle */}
+      {dockerComposeContent && (
+        <div className="flex justify-end">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setShowEditor(!showEditor)}
+          >
+            {showEditor ? 'Hide Editor' : 'Edit YAML with Suggestions'}
+          </Button>
+        </div>
+      )}
+
+      {/* Enhanced YAML Editor */}
+      {showEditor && dockerComposeContent && (
+        <EnhancedYamlEditor
+          value={dockerComposeContent}
+          onChange={(newValue) => {
+            setDockerComposeContent(newValue);
+            // Re-validate on change
+            const parseResult = DockerComposeParser.parse(newValue);
+            if (!parseResult.success) {
+              setValidationStatus({
+                isValid: false,
+                errors: [parseResult.error || 'Unknown validation error'],
+                warnings: [],
+              });
+            } else {
+              setValidationStatus({
+                isValid: true,
+                errors: [],
+                warnings: parseResult.warnings || [],
+              });
+            }
+          }}
+          fileName={fileName}
+        />
+      )}
 
       {/* Validation Status */}
       {validationStatus && (
