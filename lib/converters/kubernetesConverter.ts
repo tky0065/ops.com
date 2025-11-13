@@ -421,7 +421,12 @@ export class KubernetesConverter {
       return result;
     }
 
-    return service.environment;
+    // Convert all values to strings for Kubernetes ConfigMap compatibility
+    const result: Record<string, string> = {};
+    for (const [key, value] of Object.entries(service.environment)) {
+      result[key] = String(value);
+    }
+    return result;
   }
 
   /**
